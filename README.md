@@ -46,3 +46,13 @@ condition4.m
 costC.m
 
 subtightplot.m (see https://www.mathworks.com/matlabcentral/fileexchange/39664-subtightplot)
+
+**C++ code for the swapping algorithm estimates in Table 6.1:**
+
+Main code:
+
+main.cpp
+
+Contains the text to adapt teh code to the various cases and the results obtained:
+
+C-numericalresult.txt 

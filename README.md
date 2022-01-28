@@ -53,6 +53,6 @@ Main code:
 
 main.cpp
 
-Contains the text to adapt teh code to the various cases and the results obtained:
+Contains the text to adapt the code to the various cases and the results obtained:
 
 C-numericalresult.txt 

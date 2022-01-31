@@ -8,7 +8,7 @@
 % this code is actually a copy and merge of the single codes that one
 % can retrieve for the spcific cases.
 
-% auxiliary files needed: subtightplot.m
+% auxiliary files needed: subtightplot.m /condition2.m/condition2b.m/condition3.m
 
 clear;
 format long

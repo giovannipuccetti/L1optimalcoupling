@@ -1,7 +1,15 @@
-%This code generates the Figure Figure.Gaussian for the paper PRU17
-%for the section on the coupling of Gaussian distributions
-%The figure includes a represnetation of the optimal transport
-%in six cases
+% Extra material for the paper
+% General construction and classes of explicit L1-optimal couplings
+% by G. Puccetti ane L. Rüschendorf
+
+% This code produces Figure 6.5  which illustrates transportation lines
+% in six different cases as in Table 6.1
+
+% this code is actually a copy and merge of the single codes that one
+% can retrieve for the spcific cases.
+
+% auxiliary files needed: subtightplot.m
+
 clear;
 format long
 %suptightplot is called (must be included in the same directory)
@@ -22,7 +30,7 @@ subplot(3,2,1);
 % upper bound for the domain of a Gaussian distribution
 % everything will be restricted to [-M,M]^2
 M=4;
-%%% INPUTS: COVARIANCE MATRICES of the two Guassian measures %%%
+%%% INPUTS: COVARIANCE MATRICES of the two Gaussian measures %%%
 %mean vectors are assumed to be null
 mux = [0 0];
 muy = [0 0];
@@ -33,7 +41,6 @@ MMM=6;
 SX = [1 -0.4; -0.4 1];
 SY = [1 0.4; 0.4 1];
 %determinants of covariance matrices
-%0.748175684240197 with 500 points
 dx=det(SX);
 dy=det(SY);
 %check that one is in the unbounded domain case
@@ -64,7 +71,6 @@ v=linspace(-M,M,NN);
 fun=zeros([NN NN]);
 %ddif=difference between the densities of the two original distributions
 ddif= @(x,y) max(0,(mvnpdf([x,y],[],SX)-mvnpdf([x,y],[],SY)));
-%fun3 = @(x,y) max(0,(((1/(2*pi*sqrt(1-sx^2))).*(exp((-1/(2*(1-sx^2))).*(x.^2+y.^2-2.*sx.*x.*y))))-((1/(2*pi*sqrt(1-sy^2))).*(exp((-1/(2*(1-sy^2))).*(x.^2+y.^2-2.*sy.*x.*y))))));
 %assign different colors where open density is bigger/smaller than the other
 for i=1:NN
     for j=1:NN
@@ -84,7 +90,7 @@ plot(30:30, 'k.-','MarkerSize',5), axis([-M M -M M]);
 hold on
 image([-M,M],[-M,M],fun)
 colormap gray
-% also plot the two diagonals
+%plot the two diagonals
 hold on
 plot(u,u,'k','LineWidth',2)
 hold on
@@ -120,52 +126,18 @@ cost=zeros((resol-1),(resol-1));
 eps=0.00000001;
 lowerbound=5/4*pi+eps;
 upperbound=7/4*pi-eps;
-%first we find all optimal directions corresponding to each slice (and each
-%xdiag)
 
-% for t=11:11
-%     xdiag=xt(t);
-% xtt=linspace(lowerbound,upperbound,100);
-% xzt=linspace(0,0,100);
-% yzt=linspace(0,0,100);
-% for i=1:100
-%     yzt(i)=condition2(xtt(i));
-% end
-% plot(xtt,yzt,xtt,xzt);
-% hold on;
-% end
-
-for t=1:resol
-    t
+for t=1:resol    t
 %starting point on the main diagonal
 xdiag=xt(t);
 lowerbound=5/4*pi+eps;
 upperbound=7/4*pi-eps;
-%we check whether root is between lowerbound and upperbound
-%if condition2(lowerbound)*condition2(upperbound)<0
-%direction of optimal transport computed by taking slices
 rho_0=fzero(@condition2,[lowerbound,upperbound]);
-%else
-    %eps=0.0000001
-    %lowerbound=5/4*pi+eps;
-%upperbound=7/4*pi-eps;
-%rho_0=fzero(@condition2,[lowerbound,upperbound]);
-%otherwise we change the bounds
-% lowerbound=7/4*pi+eps;
-% upperbound=9/4*pi-eps;
-% rho_0=fzero(@condition2,[lowerbound,upperbound]);
-%rho_0=fzero(@condition2,7/4*pi+eps);
-%end
 dir1(t)=cos(rho_0);
 dir2(t)=sin(rho_0);
 upp(t)=-2*xdiag/(dir1(t)+dir2(t));
-%compute new lowerbound for next iteration
-%y=xdiag-2*xdiag*dir1(t)/(dir1(t)+dir2(t));
-%ang=atan((-y-xt(t+1))/(y-xt(t+1)));
-%lowerbound=(ang>0)*(ang+pi)+(ang<0)*(ang+2*pi)
 end
-%max values of all upp (for defining the second coordinate of trapz grid)
-mupp=max(upp);
+
 %%%% OPTIONAL: PLOT THE CANDIDATE TRANSPORTATION RAY AND SHOW
 %%%% THAT NECESSARY CONDITION IS SATISFIED IN THE LIMIT OF RESOL->INF
 
@@ -232,36 +204,12 @@ plot(-yp,-xp,'k','LineWidth',2)
 hold on;
 plot(-xp,-yp,'k','LineWidth',2)
 hold on;
-%computation of transportation cost for each value of tseq
-%difference of the densities dependning on u -xdiag is fixed
-%grid until boundary point and cost of transporttaion of g2 to g1
-% vseq=linspace(0,s0max+1,(resol-1));
-% s0=s0b(t);
-% %here secondary loop on the segment
-% for tt=1:(resol-1)
-% %fixed s1 on such grid
-% s1=vseq(tt);
-% if s1<s0 
-% %if condition is satisfied s1 is moved to s2 by quantile coupling OW it is
-% %not moved
-% %xp=xdiag+vseq(tt)*d1;
-% %yp=xdiag+vseq(tt)*d2;
-% %plot(xp,yp,'ko','LineWidth',2);
-% s2=fzero(@condition4,[s0,upp]);
-% %associated cost is abs(s2-s1)
-% %point under consideration
-% %coordx(tt,t)=xdiag+s1*d1;
-% %coordy(tt,t)=xdiag+s1*d2;
-% %cost of the transport multiplied by reduced density
-% cost(tt,t)=abs(s2-s1)*g2(s1);
-% end
 end
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%PLOT 2 OF 6 - unbounded case %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subplot(3,2,2);
-
 
 %%% NUMBER OF TRANSPORTATION RAYS (the more the rays the more accurate
 %%% the final estimate the more time consuming the code)
@@ -279,7 +227,6 @@ MMM=6;
 SX = [1 -0.4; -0.4 1];
 SY = [1 0.8; 0.8 1];
 %determinants of covariance matrices
-%0.748175684240197 with 500 points
 dx=det(SX);
 dy=det(SY);
 %check that one is in the unbounded domain case
@@ -310,7 +257,6 @@ v=linspace(-M,M,NN);
 fun=zeros([NN NN]);
 %ddif=difference between the densities of the two original distributions
 ddif= @(x,y) max(0,(mvnpdf([x,y],[],SX)-mvnpdf([x,y],[],SY)));
-%fun3 = @(x,y) max(0,(((1/(2*pi*sqrt(1-sx^2))).*(exp((-1/(2*(1-sx^2))).*(x.^2+y.^2-2.*sx.*x.*y))))-((1/(2*pi*sqrt(1-sy^2))).*(exp((-1/(2*(1-sy^2))).*(x.^2+y.^2-2.*sy.*x.*y))))));
 %assign different colors where open density is bigger/smaller than the other
 for i=1:NN
     for j=1:NN
@@ -366,52 +312,18 @@ cost=zeros((resol-1),(resol-1));
 eps=0.00000001;
 lowerbound=5/4*pi+eps;
 upperbound=7/4*pi-eps;
-%first we find all optimal directions corresponding to each slice (and each
-%xdiag)
-
-% for t=11:11
-%     xdiag=xt(t);
-% xtt=linspace(lowerbound,upperbound,100);
-% xzt=linspace(0,0,100);
-% yzt=linspace(0,0,100);
-% for i=1:100
-%     yzt(i)=condition2(xtt(i));
-% end
-% plot(xtt,yzt,xtt,xzt);
-% hold on;
-% end
-
 for t=1:resol
     t
 %starting point on the main diagonal
 xdiag=xt(t);
 lowerbound=5/4*pi+eps;
 upperbound=7/4*pi-eps;
-%we check whether root is between lowerbound and upperbound
-%if condition2(lowerbound)*condition2(upperbound)<0
-%direction of optimal transport computed by taking slices
 rho_0=fzero(@condition2,[lowerbound,upperbound]);
-%else
-    %eps=0.0000001
-    %lowerbound=5/4*pi+eps;
-%upperbound=7/4*pi-eps;
-%rho_0=fzero(@condition2,[lowerbound,upperbound]);
-%otherwise we change the bounds
-% lowerbound=7/4*pi+eps;
-% upperbound=9/4*pi-eps;
-% rho_0=fzero(@condition2,[lowerbound,upperbound]);
-%rho_0=fzero(@condition2,7/4*pi+eps);
-%end
 dir1(t)=cos(rho_0);
 dir2(t)=sin(rho_0);
 upp(t)=-2*xdiag/(dir1(t)+dir2(t));
-%compute new lowerbound for next iteration
-%y=xdiag-2*xdiag*dir1(t)/(dir1(t)+dir2(t));
-%ang=atan((-y-xt(t+1))/(y-xt(t+1)));
-%lowerbound=(ang>0)*(ang+pi)+(ang<0)*(ang+2*pi)
 end
-%max values of all upp (for defining the second coordinate of trapz grid)
-mupp=max(upp);
+
 %%%% OPTIONAL: PLOT THE CANDIDATE TRANSPORTATION RAY AND SHOW
 %%%% THAT NECESSARY CONDITION IS SATISFIED IN THE LIMIT OF RESOL->INF
 
@@ -478,29 +390,6 @@ plot(-yp,-xp,'k','LineWidth',2)
 hold on;
 plot(-xp,-yp,'k','LineWidth',2)
 hold on;
-%computation of transportation cost for each value of tseq
-%difference of the densities dependning on u -xdiag is fixed
-%grid until boundary point and cost of transporttaion of g2 to g1
-% vseq=linspace(0,s0max+1,(resol-1));
-% s0=s0b(t);
-% %here secondary loop on the segment
-% for tt=1:(resol-1)
-% %fixed s1 on such grid
-% s1=vseq(tt);
-% if s1<s0 
-% %if condition is satisfied s1 is moved to s2 by quantile coupling OW it is
-% %not moved
-% %xp=xdiag+vseq(tt)*d1;
-% %yp=xdiag+vseq(tt)*d2;
-% %plot(xp,yp,'ko','LineWidth',2);
-% s2=fzero(@condition4,[s0,upp]);
-% %associated cost is abs(s2-s1)
-% %point under consideration
-% %coordx(tt,t)=xdiag+s1*d1;
-% %coordy(tt,t)=xdiag+s1*d2;
-% %cost of the transport multiplied by reduced density
-% cost(tt,t)=abs(s2-s1)*g2(s1);
-% end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%PLOT 3 OF 6 - unbounded case 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -520,10 +409,10 @@ global xdiag SX SY sx sy d1 d2 int1 int2 s1 s0 delta1 delta2;
 %upperbound for integrals 
 MMM=6;
 %covariance matrix of X,Y. They must be invertible.
+%1.8 is approximated by 1.799 otherwise use Gaussian_OC_caseC
 SX = [1.799 -0.4; -0.4 1.799];
 SY = [1 0.4; 0.4 1];
 %determinants of covariance matrices
-%0.748175684240197 with 500 points
 dx=det(SX);
 dy=det(SY);
 %check that one is in the unbounded domain case
@@ -554,7 +443,6 @@ v=linspace(-M,M,NN);
 fun=zeros([NN NN]);
 %ddif=difference between the densities of the two original distributions
 ddif= @(x,y) max(0,(mvnpdf([x,y],[],SX)-mvnpdf([x,y],[],SY)));
-%fun3 = @(x,y) max(0,(((1/(2*pi*sqrt(1-sx^2))).*(exp((-1/(2*(1-sx^2))).*(x.^2+y.^2-2.*sx.*x.*y))))-((1/(2*pi*sqrt(1-sy^2))).*(exp((-1/(2*(1-sy^2))).*(x.^2+y.^2-2.*sy.*x.*y))))));
 %assign different colors where open density is bigger/smaller than the other
 for i=1:NN
     for j=1:NN
@@ -610,20 +498,6 @@ cost=zeros((resol-1),(resol-1));
 eps=0.00000001;
 lowerbound=5/4*pi+eps;
 upperbound=7/4*pi-eps;
-%first we find all optimal directions corresponding to each slice (and each
-%xdiag)
-
-% for t=11:11
-%     xdiag=xt(t);
-% xtt=linspace(lowerbound,upperbound,100);
-% xzt=linspace(0,0,100);
-% yzt=linspace(0,0,100);
-% for i=1:100
-%     yzt(i)=condition2(xtt(i));
-% end
-% plot(xtt,yzt,xtt,xzt);
-% hold on;
-% end
 
 for t=1:resol
     t
@@ -631,31 +505,12 @@ for t=1:resol
 xdiag=xt(t);
 lowerbound=5/4*pi+eps;
 upperbound=7/4*pi-eps;
-%we check whether root is between lowerbound and upperbound
-%if condition2(lowerbound)*condition2(upperbound)<0
-%direction of optimal transport computed by taking slices
 rho_0=fzero(@condition2,[lowerbound,upperbound]);
-%else
-    %eps=0.0000001
-    %lowerbound=5/4*pi+eps;
-%upperbound=7/4*pi-eps;
-%rho_0=fzero(@condition2,[lowerbound,upperbound]);
-%otherwise we change the bounds
-% lowerbound=7/4*pi+eps;
-% upperbound=9/4*pi-eps;
-% rho_0=fzero(@condition2,[lowerbound,upperbound]);
-%rho_0=fzero(@condition2,7/4*pi+eps);
-%end
 dir1(t)=cos(rho_0);
 dir2(t)=sin(rho_0);
 upp(t)=-2*xdiag/(dir1(t)+dir2(t));
-%compute new lowerbound for next iteration
-%y=xdiag-2*xdiag*dir1(t)/(dir1(t)+dir2(t));
-%ang=atan((-y-xt(t+1))/(y-xt(t+1)));
-%lowerbound=(ang>0)*(ang+pi)+(ang<0)*(ang+2*pi)
 end
-%max values of all upp (for defining the second coordinate of trapz grid)
-mupp=max(upp);
+
 %%%% OPTIONAL: PLOT THE CANDIDATE TRANSPORTATION RAY AND SHOW
 %%%% THAT NECESSARY CONDITION IS SATISFIED IN THE LIMIT OF RESOL->INF
 
@@ -722,29 +577,6 @@ plot(-yp,-xp,'k','LineWidth',2)
 hold on;
 plot(-xp,-yp,'k','LineWidth',2)
 hold on;
-%computation of transportation cost for each value of tseq
-%difference of the densities dependning on u -xdiag is fixed
-%grid until boundary point and cost of transporttaion of g2 to g1
-% vseq=linspace(0,s0max+1,(resol-1));
-% s0=s0b(t);
-% %here secondary loop on the segment
-% for tt=1:(resol-1)
-% %fixed s1 on such grid
-% s1=vseq(tt);
-% if s1<s0 
-% %if condition is satisfied s1 is moved to s2 by quantile coupling OW it is
-% %not moved
-% %xp=xdiag+vseq(tt)*d1;
-% %yp=xdiag+vseq(tt)*d2;
-% %plot(xp,yp,'ko','LineWidth',2);
-% s2=fzero(@condition4,[s0,upp]);
-% %associated cost is abs(s2-s1)
-% %point under consideration
-% %coordx(tt,t)=xdiag+s1*d1;
-% %coordy(tt,t)=xdiag+s1*d2;
-% %cost of the transport multiplied by reduced density
-% cost(tt,t)=abs(s2-s1)*g2(s1);
-% end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%PLOT 4 OF 6 - bounded case %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -793,7 +625,6 @@ v=linspace(-M,M,NN);
 fun=zeros([NN NN]);
 %ddif=difference between the densities of the two original distributions
 ddif= @(x,y) max(0,(mvnpdf([x,y],[],SX)-mvnpdf([x,y],[],SY)));
-%fun3 = @(x,y) max(0,(((1/(2*pi*sqrt(1-sx^2))).*(exp((-1/(2*(1-sx^2))).*(x.^2+y.^2-2.*sx.*x.*y))))-((1/(2*pi*sqrt(1-sy^2))).*(exp((-1/(2*(1-sy^2))).*(x.^2+y.^2-2.*sy.*x.*y))))));
 %assign different colors where open density is bigger/smaller than the other
 for i=1:NN
     for j=1:NN
@@ -813,7 +644,7 @@ plot(30:30, 'k.-','MarkerSize',5), axis([-M M -M M]);
 hold on
 image([-M,M],[-M,M],fun)
 colormap gray
-% also plot the two diagonals
+% plot the two diagonals
 hold on
 plot(u,u,'k','LineWidth',2)
 hold on
@@ -941,7 +772,6 @@ fun=zeros([NN NN]);
 %ddif=difference between the densities of the two original distributions
 ddif= @(x,y) max(0,(mvnpdf([x,y],[],SX)-mvnpdf([x,y],[],SY)));
 %fun3 = @(x,y) max(0,(((1/(2*pi*sqrt(1-sx^2))).*(exp((-1/(2*(1-sx^2))).*(x.^2+y.^2-2.*sx.*x.*y))))-((1/(2*pi*sqrt(1-sy^2))).*(exp((-1/(2*(1-sy^2))).*(x.^2+y.^2-2.*sy.*x.*y))))));
-%assign different colors where open density is bigger/smaller than the other
 for i=1:NN
     for j=1:NN
     x=u(i);
@@ -1066,7 +896,6 @@ v=linspace(-M,M,NN);
 fun=zeros([NN NN]);
 %ddif=difference between the densities of the two original distributions
 ddif= @(x,y) max(0,(mvnpdf([x,y],[],SX)-mvnpdf([x,y],[],SY)));
-%fun3 = @(x,y) max(0,(((1/(2*pi*sqrt(1-sx^2))).*(exp((-1/(2*(1-sx^2))).*(x.^2+y.^2-2.*sx.*x.*y))))-((1/(2*pi*sqrt(1-sy^2))).*(exp((-1/(2*(1-sy^2))).*(x.^2+y.^2-2.*sy.*x.*y))))));
 %assign different colors where open density is bigger/smaller than the other
 for i=1:NN
     for j=1:NN
